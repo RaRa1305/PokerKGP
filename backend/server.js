@@ -8,6 +8,8 @@ const connectDB = require('./config/db');
 const socketController = require('./controllers/socketController');
 
 connectDB();
+console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
+console.log("PORT:", process.env.PORT);
 
 const app = express();
 
