@@ -25,7 +25,8 @@ const Lobby = ({ currentUser, handleLoginSuccess, handleLogout, handleJoin }) =>
     return (
       <div className="app-container lobby-wrapper">
         <div className="lobby-card">
-          <h1 className="lobby-title">Poker Room</h1>
+          <img src="/PokerKGPLogo.png" alt="PokerKGP Logo" style={{ width: '120px', height: 'auto', marginBottom: '15px' }}/>
+          <h1 className="lobby-title">PokerKGP</h1>
           <p style={{ color: '#aaa', marginBottom: '2rem' }}>{isRegistering ? 'Create an account to play.' : 'Login to your account.'}</p>
           {authError && <div style={{ color: '#ef4444', marginBottom: '1rem' }}>{authError}</div>}
           <form onSubmit={handleAuth} className="auth-form">
