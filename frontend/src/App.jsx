@@ -6,6 +6,7 @@ import PlayerSeat from './components/PlayerSeat';
 import PlayingCard from './components/PlayingCard';
 import './styles/Casino.css';
 
+console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
 const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000');
 
 function App() {
