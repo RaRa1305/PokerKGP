@@ -13,7 +13,7 @@ const Lobby = ({ currentUser, handleLoginSuccess, handleLogout, handleJoin }) =>
     setAuthError('');
     const endpoint = isRegistering ? '/api/auth/register' : '/api/auth/login';
     try {
-        const res = await axios.post(`http://localhost:3000${endpoint}`, { username, password });
+        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}${endpoint}`, { username, password });
         const { token, ...userData } = res.data;
         handleLoginSuccess(userData, token);
     } catch (err) {
