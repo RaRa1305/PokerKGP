@@ -6,7 +6,7 @@ import PlayerSeat from './components/PlayerSeat';
 import PlayingCard from './components/PlayingCard';
 import './styles/Casino.css';
 
-const socket = io('http://localhost:3000', { autoConnect: false });
+const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000');
 
 function App() {
   const [currentUser, setCurrentUser] = useState(() => {
