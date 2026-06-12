@@ -1,4 +1,10 @@
-/* src/styles/Casino.css */
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #1a1a1a; 
+}
+
 .app-container {
   padding: 2rem;
   font-family: sans-serif;
@@ -14,6 +20,9 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  background-image: linear-gradient(rgba(26, 26, 26, 0.85), rgba(26, 26, 26, 0.85)), url('/bg.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
 .lobby-card {

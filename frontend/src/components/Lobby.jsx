@@ -48,7 +48,8 @@ const Lobby = ({ currentUser, handleLoginSuccess, handleLogout, handleJoin }) =>
         <button onClick={handleLogout} className="action-btn btn-fold" style={{ padding: '0.5rem 1rem' }}>LOGOUT</button>
       </div>
       <div className="lobby-card">
-        <h1 className="lobby-title">Poker Room</h1>
+        <img src="/PokerKGPLogo.png" alt="PokerKGP Logo" style={{ width: '120px', height: 'auto', marginBottom: '15px' }}/>
+        <h1 className="lobby-title">PokerKGP</h1>
         <p style={{ color: '#aaa', marginBottom: '2rem' }}>Enter a Room ID to join or create a table.</p>
         <form onSubmit={(e) => handleJoin(e, roomInput)} className="auth-form">
           <input type="text" placeholder="Room ID (e.g. HIGHROLLER)" value={roomInput} onChange={(e) => setRoomInput(e.target.value.toUpperCase())} className="casino-input" style={{ textTransform: 'uppercase' }} required />
