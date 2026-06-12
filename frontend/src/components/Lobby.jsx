@@ -25,8 +25,7 @@ const Lobby = ({ currentUser, handleLoginSuccess, handleLogout, handleJoin }) =>
     return (
       <div className="app-container lobby-wrapper">
         <div className="lobby-card">
-          <img src="/PokerKGPLogo.png" alt="PokerKGP Logo" style={{ width: '120px', height: 'auto', marginBottom: '15px' }}/>
-          <h1 className="lobby-title">PokerKGP</h1>
+          <img src="/PokerPartyLogo.png" alt="PokerParty Logo" style={{ width: '200px', height: '200px', marginBottom: '15px' }}/>
           <p style={{ color: '#aaa', marginBottom: '2rem' }}>{isRegistering ? 'Create an account to play.' : 'Login to your account.'}</p>
           {authError && <div style={{ color: '#ef4444', marginBottom: '1rem' }}>{authError}</div>}
           <form onSubmit={handleAuth} className="auth-form">
@@ -49,8 +48,7 @@ const Lobby = ({ currentUser, handleLoginSuccess, handleLogout, handleJoin }) =>
         <button onClick={handleLogout} className="action-btn btn-fold" style={{ padding: '0.5rem 1rem' }}>LOGOUT</button>
       </div>
       <div className="lobby-card">
-        <img src="/PokerKGPLogo.png" alt="PokerKGP Logo" style={{ width: '120px', height: 'auto', marginBottom: '15px' }}/>
-        <h1 className="lobby-title">PokerKGP</h1>
+        <img src="/PokerPartyLogo.png" alt="PokerParty Logo" style={{ width: '200px', height: '200px', marginBottom: '15px' }}/>
         <p style={{ color: '#aaa', marginBottom: '2rem' }}>Enter a Room ID to join or create a table.</p>
         <form onSubmit={(e) => handleJoin(e, roomInput)} className="auth-form">
           <input type="text" placeholder="Room ID" value={roomInput} onChange={(e) => setRoomInput(e.target.value.toUpperCase())} className="casino-input" required />
