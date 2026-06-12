@@ -1,0 +1,219 @@
+/* src/styles/Casino.css */
+.app-container {
+  padding: 2rem;
+  font-family: sans-serif;
+  color: white;
+  background: #1a1a1a;
+  min-height: 100vh;
+}
+
+/* --- Lobby & Auth --- */
+.lobby-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.lobby-card {
+  background: #333;
+  padding: 3rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  min-width: 350px;
+}
+
+.lobby-title {
+  color: #ffcc00;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.casino-input {
+  padding: 1rem;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  border: none;
+  background: #222;
+  color: white;
+}
+
+.casino-btn {
+  padding: 1rem;
+  font-size: 1.2rem;
+  background: linear-gradient(145deg, #4caf50, #2e7d32);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* --- Top Bar --- */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem 2rem;
+  background: rgba(0,0,0,0.5);
+  border-radius: 8px;
+  border-bottom: 2px solid #333;
+}
+
+.deal-btn {
+  padding: 0.6rem 1.5rem;
+  background: linear-gradient(145deg, #ffcc00, #d4a000);
+  color: black;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+/* --- The Felt --- */
+.poker-table {
+  position: relative;
+  margin: 100px auto 250px auto;
+  width: 100%;
+  max-width: 900px;
+  min-height: 400px;
+  background: radial-gradient(circle, #2a7a39 0%, #144520 100%);
+  border-radius: 200px;
+  border: 18px solid #1f1f1f;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.7), 0 20px 40px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-pot {
+  margin-bottom: 2rem;
+  background: linear-gradient(145deg, #111, #222);
+  padding: 0.5rem 2rem;
+  border-radius: 30px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffd700;
+  border: 2px solid #555;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  z-index: 10;
+}
+
+.community-cards {
+  display: flex;
+  gap: 12px;
+  min-height: 112px;
+  z-index: 10;
+}
+
+.card-placeholder {
+  width: 80px;
+  height: 112px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+}
+
+/* --- Player Seats --- */
+.player-seat-wrapper {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+}
+
+.player-badge {
+  position: relative;
+  background: rgba(20, 30, 20, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+  padding: 0.8rem;
+  border-radius: 12px;
+  width: 130px;
+  text-align: center;
+  transition: all 0.3s ease;
+  z-index: 20;
+}
+
+.player-badge.active-turn {
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid #ffcc00;
+  box-shadow: 0 0 20px rgba(255, 204, 0, 0.6);
+}
+
+.dealer-button {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: white;
+  color: black;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-weight: bold;
+  border: 2px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  z-index: 40;
+}
+
+/* --- Action Tray --- */
+.action-tray {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(15,15,15,1) 0%, rgba(25,25,25,0.95) 100%);
+  border-top: 2px solid #444;
+  padding: 15px 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  z-index: 100;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
+}
+
+.action-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 204, 0, 0.05);
+  padding: 15px 25px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 204, 0, 0.3);
+}
+
+.action-btn {
+  padding: 0.6rem 2rem;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.btn-fold { background: #d32f2f; }
+.btn-call { background: #1976d2; }
+.btn-raise { background: #388e3c; }
+.btn-allin { background: #9c27b0; }
+.btn-disabled { background: #555; cursor: not-allowed; }

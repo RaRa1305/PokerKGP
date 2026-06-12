@@ -1,121 +1,179 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import CasinoTable from './components/CasinoTable';
+import Lobby from './components/Lobby';
 import ActionTray from './components/ActionTray';
-import Login from './components/Login';
-import './styles/App.css';
+import PlayerSeat from './components/PlayerSeat';
+import PlayingCard from './components/PlayingCard';
+import './styles/Casino.css';
 
 const socket = io('http://localhost:3000', { autoConnect: false });
 
 function App() {
-    const [currentUser, setCurrentUser] = useState(() => {
-        const saved = localStorage.getItem('poker_user');
-        return saved ? JSON.parse(saved) : null;
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('poker_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [inGame, setInGame] = useState(false);
+  const [tableData, setTableData] = useState(null);
+  const [myCards, setMyCards] = useState([]);
+  const [gameMessage, setGameMessage] = useState('');
+  const [boardCards, setBoardCards] = useState([]);
+  const [gamePhase, setGamePhase] = useState('waiting');
+  const [revealedHands, setRevealedHands] = useState(null);
+  const [betAmount, setBetAmount] = useState(50);
+
+  const myPlayer = tableData?.players.find(p => p.id === socket.id);
+  const amountToCall = (tableData?.currentBet || 0) - (myPlayer?.roundBet || 0);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    socket.connect();
+
+    socket.on('TABLE_SYNC', (data) => {
+      setTableData(data);
+      setBoardCards(data.board || []);
+      setGamePhase(data.phase || 'waiting');
+      if (data.phase === 'pre-flop') setRevealedHands(null);
+    });
+    
+    socket.on('HOLE_CARDS', (data) => setMyCards(data.cards));
+    socket.on('GAME_MESSAGE', (data) => setGameMessage(data.message));
+    socket.on('BOARD_UPDATED', (data) => {
+      setBoardCards(data.board);
+      setGamePhase(data.phase);
+      setRevealedHands(null); 
+    });
+    socket.on('SHOWDOWN_RESULTS', (data) => {
+      setGameMessage(data.message);
+      setRevealedHands(data.revealedHands);
     });
 
-    const [joined, setJoined] = useState(false);
-    const [tableState, setTableState] = useState(null);
-    const [holeCards, setHoleCards] = useState([]);
-    const [revealedHands, setRevealedHands] = useState([]);
-    const [systemMessage, setSystemMessage] = useState('');
-
-    const targetTableId = 'Table_1';
-
-    useEffect(() => {
-        if (!currentUser) return;
-
-        socket.connect();
-
-        socket.on('TABLE_SYNC', (data) => {
-            setTableState(data);
-            if (data.phase === 'pre-flop') setRevealedHands([]);
-        });
-        socket.on('HOLE_CARDS', (data) => setHoleCards(data.cards));
-        socket.on('GAME_MESSAGE', (data) => setSystemMessage(data.message));
-        socket.on('SHOWDOWN_RESULTS', (data) => {
-            setSystemMessage(data.message);
-            setRevealedHands(data.revealedHands);
-        });
-
-        return () => {
-            socket.off('TABLE_SYNC');
-            socket.off('HOLE_CARDS');
-            socket.off('GAME_MESSAGE');
-            socket.off('SHOWDOWN_RESULTS');
-            socket.disconnect();
-        };
-    }, [currentUser]);
-
-    const handleLoginSuccess = (userData, token) => {
-        localStorage.setItem('poker_user', JSON.stringify(userData));
-        localStorage.setItem('poker_token', token);
-        setCurrentUser(userData);
+    return () => {
+      socket.off('TABLE_SYNC');
+      socket.off('HOLE_CARDS');
+      socket.off('GAME_MESSAGE');
+      socket.off('BOARD_UPDATED');
+      socket.off('SHOWDOWN_RESULTS');
+      socket.disconnect();
     };
+  }, [currentUser]);
 
-    const handleLogout = () => {
-        localStorage.removeItem('poker_user');
-        localStorage.removeItem('poker_token');
-        setCurrentUser(null);
-        setJoined(false);
-        socket.disconnect();
-    };
-
-    const joinTable = () => {
-        socket.emit('JOIN_TABLE', { 
-            username: currentUser.username, 
-            tableId: targetTableId, 
-            userId: currentUser._id 
-        });
-        setJoined(true);
-    };
-
-    const startGame = () => socket.emit('START_GAME', { tableId: targetTableId });
-
-    if (!currentUser) return <Login onLoginSuccess={handleLoginSuccess} />;
-
-    if (!joined) {
-        return (
-            <div className="poker-room">
-                <div style={{ position: 'absolute', top: 20, right: 20, display: 'flex', gap: '15px', alignItems: 'center' }}>
-                    <span>{currentUser.username} | ${currentUser.chips}</span>
-                    <button onClick={handleLogout} className="action-btn btn-fold">Logout</button>
-                </div>
-                <h1>PokerKGP Casino Floor</h1>
-                <button className="action-btn btn-check-call" onClick={joinTable}>Sit at Table 1</button>
-            </div>
-        );
+  useEffect(() => {
+    if (tableData && socket.id && tableData.currentTurn === socket.id) {
+      setBetAmount(tableData.currentBet > 0 ? tableData.currentBet : 50);
     }
+  }, [tableData?.currentTurn, tableData?.currentBet, socket.id]);
 
-    const myPlayer = tableState?.players.find(p => p.id === socket.id);
-    const isMyTurn = tableState?.currentTurn === socket.id;
-    const callAmount = myPlayer ? Math.max(0, tableState.currentBet - (myPlayer.roundBet || 0)) : 0;
+  const handleLoginSuccess = (userData, token) => {
+    localStorage.setItem('poker_user', JSON.stringify(userData));
+    localStorage.setItem('poker_token', token);
+    setCurrentUser(userData);
+  };
 
-    if (tableState && myPlayer) myPlayer.holeCards = holeCards;
+  const handleLogout = () => {
+    localStorage.removeItem('poker_user');
+    localStorage.removeItem('poker_token');
+    setCurrentUser(null);
+    setInGame(false);
+    socket.disconnect();
+  };
 
-    return (
-        <div className="poker-room">
-            <h2 style={{ height: '30px' }}>{systemMessage || 'Waiting for action...'}</h2>
-            
-            <CasinoTable 
-                tableState={tableState} 
-                myId={socket.id} 
-                revealedHands={revealedHands} 
-            />
-            
-            {tableState?.phase === 'waiting' ? (
-                <button className="action-btn btn-check-call" onClick={startGame}>Start Hand</button>
-            ) : (
-                <ActionTray 
-                    socket={socket} 
-                    tableId={targetTableId} 
-                    currentBet={tableState?.currentBet || 0}
-                    isMyTurn={isMyTurn}
-                    playerChips={myPlayer?.chips || 0}
-                    callAmount={callAmount}
-                />
-            )}
+  const handleJoin = (e, roomInput) => {
+    e.preventDefault();
+    if (currentUser && roomInput.trim()) {
+      socket.emit('JOIN_TABLE', { 
+        username: currentUser.username, 
+        tableId: roomInput.trim().toUpperCase(),
+        userId: currentUser._id 
+      });
+      setInGame(true);
+    }
+  };
+
+  const startGame = () => {
+    if (tableData?.tableId) socket.emit('START_GAME', { tableId: tableData.tableId });
+  };
+
+  const sendAction = (action, amount) => {
+    if (tableData?.tableId) socket.emit('PLAYER_ACTION', { tableId: tableData.tableId, action, amount });
+  };
+
+  if (!currentUser || !inGame) {
+    return <Lobby currentUser={currentUser} handleLoginSuccess={handleLoginSuccess} handleLogout={handleLogout} handleJoin={handleJoin} />;
+  }
+
+  return (
+    <div className="app-container">
+      <h1 className="lobby-title" style={{ textAlign: 'center', fontSize: '1.8rem' }}>
+        Room: {tableData?.tableId || 'Lobby'}
+      </h1>
+      
+      <div className="top-nav">
+        <div style={{ color: '#4caf50', fontSize: '1.2rem', fontWeight: 'bold' }}>
+          {gameMessage || 'Waiting for players...'}
         </div>
-    );
+        {(!tableData?.dealerId || tableData.dealerId === socket.id) && gamePhase === 'waiting' && tableData?.players?.length >= 2 && (
+          <button onClick={startGame} className="deal-btn">DEAL NEW HAND</button>
+        )}
+      </div>
+
+      <div className="poker-table">
+        <div className="main-pot">Main Pot: ${tableData?.pot || 0}</div>
+
+        <div className="community-cards">
+          {[0, 1, 2, 3, 4].map(index => (
+             boardCards[index] 
+              ? <PlayingCard key={index} index={index} cardString={boardCards[index]} />
+              : <div key={index} className="card-placeholder"></div>
+          ))}
+        </div>
+
+        {tableData?.players.map((player, index) => (
+          <PlayerSeat 
+            key={player.id} 
+            player={player} 
+            index={index} 
+            totalPlayers={tableData.players.length} 
+            isTheirTurn={tableData.currentTurn === player.id} 
+            isDealer={tableData.dealerId === player.id} 
+            hasCards={gamePhase !== 'waiting' && player.status !== 'Folded'} 
+            socketId={socket.id} 
+            myCards={myCards} 
+          />
+        ))}
+      </div>
+      
+      {revealedHands && (
+        <div style={{ padding: '1rem', background: '#333', borderRadius: '8px', border: '2px solid #e91e63', marginBottom: '250px' }}>
+          <h3 style={{ margin: '0 0 10px 0', color: '#e91e63' }}>Showdown!</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {revealedHands.map((rh, idx) => (
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ minWidth: '80px' }}>{rh.username}:</span>
+                <div style={{ display: 'flex', gap: '5px' }}>
+                  {rh.cards.map((c, i) => <PlayingCard key={i} cardString={c} />)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {(gamePhase !== 'waiting' || tableData?.currentTurn === socket.id) && (
+        <ActionTray 
+          myCards={myCards} 
+          isMyTurn={tableData?.currentTurn === socket.id} 
+          currentBet={tableData?.currentBet || 0} 
+          betAmount={betAmount} 
+          setBetAmount={setBetAmount} 
+          amountToCall={amountToCall} 
+          myChips={myPlayer?.chips || 0} 
+          sendAction={sendAction} 
+        />
+      )}
+    </div>
+  );
 }
 
 export default App;
