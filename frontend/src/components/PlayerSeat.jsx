@@ -4,7 +4,7 @@ import PlayingCard from './PlayingCard';
 const PlayerSeat = ({ player, index, uiIndex, totalPlayers, isTheirTurn, isDealer, hasCards, socketId, myCards, spectatorCards }) => {
   // Radial Math
   const activeIndex = uiIndex !== undefined ? uiIndex : index;
-  const angle = (activeIndexindex / totalPlayers) * (2 * Math.PI) + (Math.PI / 2);
+  const angle = (activeIndex / totalPlayers) * (2 * Math.PI) + (Math.PI / 2);
   const radiusX = 460; 
   const radiusY = 240; 
   const x = Math.cos(angle) * radiusX;

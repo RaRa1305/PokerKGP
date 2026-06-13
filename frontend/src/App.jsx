@@ -150,21 +150,26 @@ function App() {
           ))}
         </div>
 
-        {tableData?.players.map((player, index) => (
-          <PlayerSeat 
-            key={player.id} 
-            player={player} 
-            index={index}
-            uiIndex={uiIndex} 
-            totalPlayers={tableData.players.length} 
-            isTheirTurn={tableData.currentTurn === player.id} 
-            isDealer={tableData.dealerId === player.id} 
-            hasCards={gamePhase !== 'waiting' && player.status !== 'Folded'} 
-            socketId={socket.id} 
-            myCards={myCards}
-            spectatorCards={spectatorCards[player.id]} 
-          />
-        ))}
+        {tableData?.players.map((player, index) => {
+          const totalPlayers = tableData.players.length;
+          const uiIndex = getUIIndex(index, totalPlayers);
+
+          return (
+            <PlayerSeat 
+              key={player.id} 
+              player={player} 
+              index={index}
+              uiIndex={uiIndex} 
+              totalPlayers={totalPlayers} 
+              isTheirTurn={tableData.currentTurn === player.id} 
+              isDealer={tableData.dealerId === player.id} 
+              hasCards={gamePhase !== 'waiting' && player.status !== 'Folded'} 
+              socketId={socket.id} 
+              myCards={myCards}
+              spectatorCards={spectatorCards ? spectatorCards[player.id] : undefined} 
+            />
+          );
+        })}
       </div>
       
       {revealedHands && (
