@@ -122,6 +122,17 @@ function App() {
     if (tableData?.tableId) socket.emit('START_GAME', { tableId: tableData.tableId });
   };
 
+  const handleLeaveTable = () => {
+    socket.emit('LEAVE_TABLE');
+    
+    setTableData(null);
+    setBoardCards([]);
+    setMyCards([]);
+    setSpectatorCards({});
+
+    setCurrentView('account');
+  };
+
   const sendAction = (action, amount) => {
     if (tableData?.tableId) socket.emit('PLAYER_ACTION', { tableId: tableData.tableId, action, amount });
   };
