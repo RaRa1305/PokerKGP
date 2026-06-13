@@ -142,7 +142,15 @@ function App() {
   }
 
   if (currentView === 'account') {
-    return <Account currentUser={currentUser} handleLogout={handleLogout} handleJoin={handleJoin} />;
+    return (
+      <Account 
+        currentUser={currentUser} 
+        setCurrentUser={setCurrentUser} 
+        handleLogout={handleLogout} 
+        handleJoin={handleJoin} 
+        socket={socket} 
+      />
+    );
   }
 
   return (
