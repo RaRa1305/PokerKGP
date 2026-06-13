@@ -28,7 +28,7 @@ function App() {
   const myPlayer = tableData?.players.find(p => p.id === socket.id);
   const amountToCall = (tableData?.currentBet || 0) - (myPlayer?.roundBet || 0);
 
-  const userIndex = tableData?.players.findIndex(p => p.id === socket.id);
+  const userIndex = tableData?.players.findIndex(p => p.id === socket.id) ?? -1;
 
   const getUIIndex = (serverIndex, total) => {
     if (userIndex === undefined || userIndex === -1) return serverIndex;

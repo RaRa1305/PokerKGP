@@ -155,13 +155,21 @@ module.exports = (io) => {
         });
 
         socket.on('SPECTATE_TABLE', ({ username, tableId }) => {
-            
             socket.join(`${tableId}_SPECTATORS`); 
             socket.join(tableId); 
 
-            const game = games[tableId]; 
-            if (game) {
-                socket.emit('TABLE_SYNC', game.getGameState());
+            const table = gameState.tables[tableId]; 
+            
+            if (table) {
+                socket.emit('TABLE_SYNC', {
+                    tableId, board: table.board, phase: table.phase, pot: table.pot || 0,
+                    dealerId: table.dealerId, currentTurn: table.currentTurn, currentBet: table.currentBet || 0,
+                    players: table.players.map(id => ({
+                        id, username: gameState.players[id].username, chips: gameState.players[id].chips,
+                        status: gameState.players[id].status || 'Waiting', roundBet: gameState.players[id].roundBet || 0  
+                    }))
+                });
+                
                 io.to(tableId).emit('GAME_MESSAGE', { 
                     message: `${username} is spectating the table.` 
                 }); 
