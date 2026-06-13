@@ -180,6 +180,24 @@ module.exports = (io) => {
             }
         });
 
+        socket.on('RELOAD_BANKROLL', async ({ userId }) => {
+            try {
+                const user = await User.findById(userId);
+                if (user && user.chips < 100) {
+                    user.chips += 1000; 
+                    await user.save();
+                    
+                    if (gameState.players[socket.id]) {
+                        gameState.players[socket.id].chips = user.chips;
+                    }
+
+                    socket.emit('BANKROLL_UPDATED', { newBalance: user.chips });
+                }
+            } catch (err) {
+                console.error("Error reloading bankroll:", err);
+            }
+        });
+
         socket.on('START_GAME', ({ tableId }) => {
             const table = gameState.tables[tableId];
             if (!table || table.phase !== 'waiting' || table.players.length < 2) return io.to(tableId).emit('GAME_MESSAGE', { message: "Cannot start game." });
