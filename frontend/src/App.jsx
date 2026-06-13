@@ -15,7 +15,10 @@ function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
-  const [inGame, setInGame] = useState(false);
+  const [currentView, setCurrentView] = useState(() => {
+    const saved = localStorage.getItem('poker_user');
+    return saved ? 'account' : 'auth';
+  });
   const [tableData, setTableData] = useState(null);
   const [myCards, setMyCards] = useState([]);
   const [gameMessage, setGameMessage] = useState('');
@@ -83,13 +86,14 @@ function App() {
     localStorage.setItem('poker_user', JSON.stringify(userData));
     localStorage.setItem('poker_token', token);
     setCurrentUser(userData);
+    setCurrentView('account');
   };
 
   const handleLogout = () => {
     localStorage.removeItem('poker_user');
     localStorage.removeItem('poker_token');
     setCurrentUser(null);
-    setInGame(false);
+    setCurrentView('auth');
     socket.disconnect();
   };
 
@@ -108,7 +112,7 @@ function App() {
         socket.emit('JOIN_TABLE', payload);
       }
       
-      setInGame(true);
+      setCurrentView('table');
     }
   };
 
@@ -120,13 +124,25 @@ function App() {
     if (tableData?.tableId) socket.emit('PLAYER_ACTION', { tableId: tableData.tableId, action, amount });
   };
 
-  if (!currentUser || !inGame) {
-    return <Lobby currentUser={currentUser} handleLoginSuccess={handleLoginSuccess} handleLogout={handleLogout} handleJoin={handleJoin} />;
+ if (currentView === 'auth') {
+    return <Lobby currentUser={currentUser} handleLoginSuccess={handleLoginSuccess} />;
+  }
+
+  if (currentView === 'account') {
+    return <Account currentUser={currentUser} handleLogout={handleLogout} handleJoin={handleJoin} />;
   }
 
   return (
     <div className="app-container">
-      <h1 className="lobby-title" style={{ textAlign: 'center', fontSize: '1.8rem' }}>
+      <button 
+        onClick={handleLeaveTable} 
+        className="action-btn btn-fold"
+        style={{ position: 'absolute', top: 20, left: 20, zIndex: 100, padding: '0.5rem 1rem' }}
+      >
+        LEAVE TABLE
+      </button>
+
+      <h1 className="lobby-title" style={{ textAlign: 'center', fontSize: '1.8rem', paddingTop: '10px' }}>
         Room: {tableData?.tableId || 'Lobby'}
       </h1>
       
