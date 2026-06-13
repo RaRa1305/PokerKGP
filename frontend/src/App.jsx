@@ -27,6 +27,13 @@ function App() {
   const myPlayer = tableData?.players.find(p => p.id === socket.id);
   const amountToCall = (tableData?.currentBet || 0) - (myPlayer?.roundBet || 0);
 
+  const userIndex = tableData?.players.findIndex(p => p.id === socket.id);
+
+  const getUIIndex = (serverIndex, total) => {
+    if (userIndex === undefined || userIndex === -1) return serverIndex;
+    return (serverIndex - heroIndex + total) % total;
+  };
+
   useEffect(() => {
     if (!currentUser) return;
     socket.connect();
@@ -134,7 +141,8 @@ function App() {
           <PlayerSeat 
             key={player.id} 
             player={player} 
-            index={index} 
+            index={index}
+            uiIndex={uiIndex} 
             totalPlayers={tableData.players.length} 
             isTheirTurn={tableData.currentTurn === player.id} 
             isDealer={tableData.dealerId === player.id} 

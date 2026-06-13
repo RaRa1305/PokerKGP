@@ -1,9 +1,10 @@
 import React from 'react';
 import PlayingCard from './PlayingCard';
 
-const PlayerSeat = ({ player, index, totalPlayers, isTheirTurn, isDealer, hasCards, socketId, myCards }) => {
+const PlayerSeat = ({ player, index,uiIndex, totalPlayers, isTheirTurn, isDealer, hasCards, socketId, myCards }) => {
   // Radial Math
-  const angle = (index / totalPlayers) * (2 * Math.PI) + (Math.PI / 2);
+  const activeIndex = uiIndex !== undefined ? uiIndex : index;
+  const angle = (activeIndexindex / totalPlayers) * (2 * Math.PI) + (Math.PI / 2);
   const radiusX = 460; 
   const radiusY = 240; 
   const x = Math.cos(angle) * radiusX;
