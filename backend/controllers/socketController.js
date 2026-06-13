@@ -176,11 +176,7 @@ module.exports = (io) => {
                         currentCardsMap[pId] = gameState.players[pId].holeCards;
                     });
                     socket.emit('SPECTATOR_CARDS', currentCardsMap);
-                }
-                
-                io.to(tableId).emit('GAME_MESSAGE', { 
-                    message: `${username} is spectating the table.` 
-                }); 
+                } 
             }
         });
 
