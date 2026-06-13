@@ -32,7 +32,7 @@ function App() {
 
   const getUIIndex = (serverIndex, total) => {
     if (userIndex === undefined || userIndex === -1) return serverIndex;
-    return (serverIndex - heroIndex + total) % total;
+    return (serverIndex - userIndex + total) % total;
   };
 
   useEffect(() => {
