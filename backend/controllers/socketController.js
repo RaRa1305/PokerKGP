@@ -218,6 +218,11 @@ module.exports = (io) => {
             if (!table || table.currentTurn !== socket.id) return;
             const player = gameState.players[socket.id];
 
+            if (action === 'raise') {
+                amount = parseInt(amount, 10);
+                if (isNaN(amount) || amount <= 0) return; // Ignore malicious/broken requests
+            }
+
             if (action === 'fold') {
                 player.status = 'Folded'; table.actionsThisRound++;
             } else if (action === 'call') {
