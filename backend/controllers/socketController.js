@@ -154,6 +154,20 @@ module.exports = (io) => {
             syncTable(tableId);
         });
 
+        socket.on('SPECTATE_TABLE', ({ username, tableId }) => {
+            
+            socket.join(`${tableId}_SPECTATORS`); 
+            socket.join(tableId); 
+
+            const game = games[tableId]; 
+            if (game) {
+                socket.emit('TABLE_SYNC', game.getGameState());
+                io.to(tableId).emit('GAME_MESSAGE', { 
+                    message: `${username} is spectating the table.` 
+                }); 
+            }
+        });
+
         socket.on('START_GAME', ({ tableId }) => {
             const table = gameState.tables[tableId];
             if (!table || table.phase !== 'waiting' || table.players.length < 2) return io.to(tableId).emit('GAME_MESSAGE', { message: "Cannot start game." });
@@ -168,12 +182,17 @@ module.exports = (io) => {
 
             let sbPlayerId = table.players[sbIndex], bbPlayerId = table.players[bbIndex];
 
+            const allCardsMap = {};
+
             table.players.forEach(pId => {
                 let p = gameState.players[pId];
                 p.status = 'Waiting'; p.roundBet = 0; p.totalInvested = 0; p.holeCards = [table.deck.pop(), table.deck.pop()];
                 io.to(pId).emit('HOLE_CARDS', { cards: p.holeCards });
+                allCardsMap[pId] = p.holeCards;
             });
 
+            io.to(`${tableId}_SPECTATORS`).emit('SPECTATOR_CARDS', allCardsMap);
+            
             gameState.players[sbPlayerId].chips -= 10; gameState.players[sbPlayerId].roundBet = 10; gameState.players[sbPlayerId].totalInvested = 10; gameState.players[sbPlayerId].status = 'Small Blind';
             gameState.players[bbPlayerId].chips -= 20; gameState.players[bbPlayerId].roundBet = 20; gameState.players[bbPlayerId].totalInvested = 20; gameState.players[bbPlayerId].status = 'Big Blind';
 

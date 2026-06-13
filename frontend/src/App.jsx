@@ -23,6 +23,7 @@ function App() {
   const [gamePhase, setGamePhase] = useState('waiting');
   const [revealedHands, setRevealedHands] = useState(null);
   const [betAmount, setBetAmount] = useState(50);
+  const [spectatorCards, setSpectatorCards] = useState({});
 
   const myPlayer = tableData?.players.find(p => p.id === socket.id);
   const amountToCall = (tableData?.currentBet || 0) - (myPlayer?.roundBet || 0);
@@ -38,11 +39,15 @@ function App() {
     if (!currentUser) return;
     socket.connect();
 
+    socket.on('SPECTATOR_CARDS', (cardMap) => setSpectatorCards(cardMap));
     socket.on('TABLE_SYNC', (data) => {
       setTableData(data);
       setBoardCards(data.board || []);
       setGamePhase(data.phase || 'waiting');
-      if (data.phase === 'pre-flop') setRevealedHands(null);
+      if (data.phase === 'pre-flop') {
+        setRevealedHands(null);
+        setSpectatorCards({});
+      }
     });
     
     socket.on('HOLE_CARDS', (data) => setMyCards(data.cards));
@@ -58,6 +63,7 @@ function App() {
     });
 
     return () => {
+      socket.off('SPECTATOR_CARDS');
       socket.off('TABLE_SYNC');
       socket.off('HOLE_CARDS');
       socket.off('GAME_MESSAGE');
@@ -87,14 +93,21 @@ function App() {
     socket.disconnect();
   };
 
-  const handleJoin = (e, roomInput) => {
+  const handleJoin = (e, roomInput, actionType = 'join') => {
     e.preventDefault();
     if (currentUser && roomInput.trim()) {
-      socket.emit('JOIN_TABLE', { 
+      const payload = { 
         username: currentUser.username, 
         tableId: roomInput.trim().toUpperCase(),
         userId: currentUser._id 
-      });
+      };
+
+      if (actionType === 'spectate') {
+        socket.emit('SPECTATE_TABLE', payload);
+      } else {
+        socket.emit('JOIN_TABLE', payload);
+      }
+      
       setInGame(true);
     }
   };
@@ -148,7 +161,8 @@ function App() {
             isDealer={tableData.dealerId === player.id} 
             hasCards={gamePhase !== 'waiting' && player.status !== 'Folded'} 
             socketId={socket.id} 
-            myCards={myCards} 
+            myCards={myCards}
+            spectatorCards={spectatorCards[player.id]} 
           />
         ))}
       </div>

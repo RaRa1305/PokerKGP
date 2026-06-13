@@ -50,9 +50,28 @@ const Lobby = ({ currentUser, handleLoginSuccess, handleLogout, handleJoin }) =>
       <div className="lobby-card">
         <img src="/PokerPartyLogo.png" alt="PokerParty Logo" style={{ width: '200px', height: '200px', marginBottom: '15px' }}/>
         <p style={{ color: '#aaa', marginBottom: '2rem' }}>Enter a Room ID to join or create a table.</p>
-        <form onSubmit={(e) => handleJoin(e, roomInput)} className="auth-form">
-          <input type="text" placeholder="Room ID" value={roomInput} onChange={(e) => setRoomInput(e.target.value.toUpperCase())} className="casino-input" required />
-          <button type="submit" className="casino-btn">JOIN TABLE</button>
+        <form onSubmit={(e) => handleJoin(e, roomInput, 'join')} className="auth-form">
+          <input 
+            type="text" 
+            placeholder="Room ID" 
+            value={roomInput} 
+            onChange={(e) => setRoomInput(e.target.value.toUpperCase())} 
+            className="casino-input" 
+            required 
+          />
+          <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
+            <button type="submit" className="casino-btn" style={{ flex: 1 }}>
+              JOIN SEAT
+            </button>
+            <button 
+              type="button" 
+              onClick={(e) => handleJoin(e, roomInput, 'spectate')} 
+              className="casino-btn" 
+              style={{ flex: 1, backgroundColor: '#555' }}
+            >
+              SPECTATE
+            </button>
+          </div>
         </form>
       </div>
     </div>

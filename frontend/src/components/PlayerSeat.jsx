@@ -1,7 +1,7 @@
 import React from 'react';
 import PlayingCard from './PlayingCard';
 
-const PlayerSeat = ({ player, index,uiIndex, totalPlayers, isTheirTurn, isDealer, hasCards, socketId, myCards }) => {
+const PlayerSeat = ({ player, index, uiIndex, totalPlayers, isTheirTurn, isDealer, hasCards, socketId, myCards, spectatorCards }) => {
   // Radial Math
   const activeIndex = uiIndex !== undefined ? uiIndex : index;
   const angle = (activeIndexindex / totalPlayers) * (2 * Math.PI) + (Math.PI / 2);
@@ -11,20 +11,26 @@ const PlayerSeat = ({ player, index,uiIndex, totalPlayers, isTheirTurn, isDealer
   const y = Math.sin(angle) * radiusY;
 
   return (
-    <div 
-      className="player-seat-wrapper" 
-      style={{ transform: `translate(${x}px, ${y}px)` }}
-    >
+    <div className="player-seat-wrapper" style={{ transform: `translate(${x}px, ${y}px)` }}>
       {hasCards && (
         <div style={{ position: 'absolute', top: '-25px', left: '-35px', display: 'flex', gap: '2px', zIndex: 30, transform: 'scale(0.35)', transformOrigin: 'top right' }}>
+          
+          {/* It is my seat, show my cards */}
           {player.id === socketId && myCards.length > 0 ? (
             myCards.map((card, idx) => <PlayingCard key={idx} index={idx} cardString={card} />)
-          ) : (
+          ) : 
+          /* I am a spectator, show this player's known cards */
+          spectatorCards && spectatorCards.length > 0 ? (
+            spectatorCards.map((card, idx) => <PlayingCard key={idx} index={idx} cardString={card} />)
+          ) : 
+          /*I am playing, this is an opponent, show card backs */
+          (
             <>
               <PlayingCard index={0} hidden={true} />
               <PlayingCard index={1} hidden={true} />
             </>
           )}
+
         </div>
       )}
 
