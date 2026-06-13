@@ -169,6 +169,14 @@ module.exports = (io) => {
                         status: gameState.players[id].status || 'Waiting', roundBet: gameState.players[id].roundBet || 0  
                     }))
                 });
+
+                if (table.phase !== 'waiting') {
+                    const currentCardsMap = {};
+                    table.players.forEach(pId => {
+                        currentCardsMap[pId] = gameState.players[pId].holeCards;
+                    });
+                    socket.emit('SPECTATOR_CARDS', currentCardsMap);
+                }
                 
                 io.to(tableId).emit('GAME_MESSAGE', { 
                     message: `${username} is spectating the table.` 

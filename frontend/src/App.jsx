@@ -44,7 +44,7 @@ function App() {
       setTableData(data);
       setBoardCards(data.board || []);
       setGamePhase(data.phase || 'waiting');
-      if (data.phase === 'pre-flop') {
+      if (data.phase === 'waiting') {
         setRevealedHands(null);
         setSpectatorCards({});
       }
