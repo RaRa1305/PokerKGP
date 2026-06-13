@@ -279,6 +279,42 @@ module.exports = (io) => {
             syncTable(tableId);
         });
 
+        socket.on('LEAVE_TABLE', async () => {
+            const p = gameState.players[socket.id];
+            if (!p) return;
+
+            const tableId = p.tableId;
+            const table = gameState.tables[tableId];
+
+            if (table) {
+                if (table.currentTurn === socket.id) {
+                    p.status = 'Folded';
+                    let playersInHand = table.players.filter(id => gameState.players[id]?.status !== 'Folded');
+                    
+                    if (playersInHand.length === 1) {
+                        gameState.players[playersInHand[0]].chips += table.pot;
+                        io.to(tableId).emit('GAME_MESSAGE', { message: `${gameState.players[playersInHand[0]].username} wins $${table.pot} (Opponent left)` });
+                        await syncChips(playersInHand[0]); 
+                        table.pot = 0; table.phase = 'waiting'; table.currentBet = 0; table.currentTurn = null;
+                    } else {
+                        advancePhase(tableId); 
+                    }
+                }
+
+                table.players = table.players.filter(id => id !== socket.id);
+                
+                await syncChips(socket.id);
+
+                socket.leave(tableId);
+                socket.leave(`${tableId}_SPECTATORS`);
+
+                io.to(tableId).emit('GAME_MESSAGE', { message: `${p.username} has left the table.` });
+                syncTable(tableId);
+            }
+
+            delete gameState.players[socket.id];
+        });
+
         socket.on('disconnect', async () => {
             const p = gameState.players[socket.id];
             if (p) {
