@@ -208,7 +208,7 @@ module.exports = (io) => {
             gameState.players[sbPlayerId].chips -= 10; gameState.players[sbPlayerId].roundBet = 10; gameState.players[sbPlayerId].totalInvested = 10; gameState.players[sbPlayerId].status = 'Small Blind';
             gameState.players[bbPlayerId].chips -= 20; gameState.players[bbPlayerId].roundBet = 20; gameState.players[bbPlayerId].totalInvested = 20; gameState.players[bbPlayerId].status = 'Big Blind';
 
-            table.pot = 30; table.currentBet = 20; table.turnIndex = utgIndex; table.currentTurn = table.players[table.turnIndex];
+            table.pot = 30; table.currentBet = 20; table.lastRaiseAmount = 20; table.turnIndex = utgIndex; table.currentTurn = table.players[table.turnIndex];
             syncTable(tableId);
             io.to(tableId).emit('GAME_MESSAGE', { message: 'Blinds posted. Pre-flop action is on!' });
         });
@@ -226,11 +226,25 @@ module.exports = (io) => {
                 player.chips -= callAmt; table.pot += callAmt; player.roundBet = (player.roundBet || 0) + callAmt; player.totalInvested = (player.totalInvested || 0) + callAmt;
                 table.actionsThisRound++; 
             } else if (action === 'raise') {
+                const minRaiseTarget = table.currentBet + (table.lastRaiseAmount || 0);
+                const playerTotalAvailable = player.chips + (player.roundBet || 0);
+
+                if (amount < minRaiseTarget && amount !== playerTotalAvailable) return;
+                
                 if (amount <= table.currentBet) return;
+
                 let raiseAmt = Math.min(player.chips, amount - (player.roundBet || 0));
                 player.status = raiseAmt === player.chips ? 'All-In' : `Raised to $${amount}`;
-                if (player.status !== 'All-In' || (player.roundBet || 0) + raiseAmt > table.currentBet) table.currentBet = (player.roundBet || 0) + raiseAmt;
-                player.chips -= raiseAmt; table.pot += raiseAmt; player.roundBet = (player.roundBet || 0) + raiseAmt; player.totalInvested = (player.totalInvested || 0) + raiseAmt;
+
+                if (player.status !== 'All-In' || (player.roundBet || 0) + raiseAmt > table.currentBet) {
+                    table.lastRaiseAmount = amount - table.currentBet; 
+                    table.currentBet = (player.roundBet || 0) + raiseAmt;
+                }
+
+                player.chips -= raiseAmt; 
+                table.pot += raiseAmt; 
+                player.roundBet = (player.roundBet || 0) + raiseAmt; 
+                player.totalInvested = (player.totalInvested || 0) + raiseAmt;
                 table.actionsThisRound = 1; 
             }
 
