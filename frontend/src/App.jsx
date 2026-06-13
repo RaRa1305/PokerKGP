@@ -4,7 +4,9 @@ import Lobby from './components/Lobby';
 import ActionTray from './components/ActionTray';
 import PlayerSeat from './components/PlayerSeat';
 import PlayingCard from './components/PlayingCard';
+import Account from './components/Account';
 import './styles/Casino.css';
+
 
 console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
 const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000');
