@@ -35,7 +35,7 @@ const Account = ({ currentUser, setCurrentUser, handleLogout, handleJoin, socket
         </button>
       </div>
 
-      <div style={{ maxWidth: '1000px', width: '100%', marginTop: '40px', marginLeft: '5%', marginRight: 'auto' }}>
+    <div style={{ maxWidth: '1000px', width: '100%', marginTop: '40px', marginLeft: 'auto', marginRight: 'auto' }}> 
         <h2 style={{ color: '#ffcc00', marginBottom: '20px', textAlign: 'center', fontSize: '2rem' }}>
           Welcome, {currentUser.username}
         </h2>
