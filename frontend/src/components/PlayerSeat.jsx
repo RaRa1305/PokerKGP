@@ -13,7 +13,7 @@ const PlayerSeat = ({ player, index, uiIndex, totalPlayers, isTheirTurn, isDeale
   return (
     <div className="player-seat-wrapper" style={{ transform: `translate(${x}px, ${y}px)` }}>
       {hasCards && (
-        <div style={{ position: 'absolute', top: '-25px', left: '-35px', display: 'flex', gap: '2px', zIndex: 30, transform: 'scale(0.35)', transformOrigin: 'top right' }}>
+        <div style={{ position: 'absolute', top: '-25px', right: '35px', display: 'flex', gap: '2px', zIndex: 30, transform: 'scale(0.35)', transformOrigin: 'bottom right' }}>
           
           {/* It is my seat, show my cards */}
           {player.id === socketId && myCards.length > 0 ? (
