@@ -41,8 +41,8 @@ const Account = ({ currentUser, setCurrentUser, handleLogout, handleJoin, socket
           Welcome, {currentUser.username}
         </h2>
         
-        {/* TWO-COLUMN LAYOUT CONTAINER */}
-        <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap' }}>
+{/* TWO-COLUMN LAYOUT CONTAINER */}
+<div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap', justifyContent: 'center' }}>
           
           {/* LEFT COLUMN: Bankroll & Room Joiner */}
           <div style={{ flex: '1 1 350px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
