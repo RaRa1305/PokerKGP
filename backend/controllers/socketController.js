@@ -190,6 +190,15 @@ module.exports = (io) => {
             syncTable(tableId);
         });
 
+        socket.on('SEND_CHAT', ({ tableId, username, message, isEmote }) => {
+            io.to(tableId).emit('RECEIVE_CHAT', { 
+                username, 
+                message, 
+                isEmote,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            });
+        });
+
         socket.on('SPECTATE_TABLE', ({ username, tableId,userId }) => {
 
             const table = gameState.tables[tableId]; 

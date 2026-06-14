@@ -5,6 +5,7 @@ import ActionTray from './components/ActionTray';
 import PlayerSeat from './components/PlayerSeat';
 import PlayingCard from './components/PlayingCard';
 import Account from './components/Account';
+import ChatBox from './components/ChatBox';
 import './styles/Casino.css';
 
 
@@ -242,6 +243,15 @@ function App() {
           sendAction={sendAction} 
         />
       )}
+
+      <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 100 }}>
+        <ChatBox 
+          socket={socket} 
+          tableId={tableData?.tableId} 
+          currentUser={currentUser} 
+        />
+      </div>
+      
     </div>
   );
 }
