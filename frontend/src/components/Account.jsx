@@ -53,7 +53,7 @@ const Account = ({ currentUser, setCurrentUser, handleLogout, handleJoin, socket
             {/* Bankroll Box - GLASS EFFECT */}
             <div className="lobby-card" style={{ background: 'rgba(25, 25, 25, 0.75)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)', padding: '30px', borderRadius: '12px', textAlign: 'center' }}>
               <p style={{ color: '#bbb', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.9rem' }}>Current Bankroll</p>
-              <h1 style={{ color: '#4caf50', margin: '0', fontSize: '3.5rem', textShadow: '0px 0px 10px rgba(76, 175, 80, 0.3)' }}>${currentUser.chips}</h1>
+              <h1 style={{ color: '#4caf50', margin: '0', fontSize: '3.5rem', textShadow: '0px 0px 10px rgba(76, 175, 80, 0.3)' }}>₹{currentUser.chips}</h1>
               
               {currentUser.chips < 500 && (
                 <button 
@@ -61,7 +61,7 @@ const Account = ({ currentUser, setCurrentUser, handleLogout, handleJoin, socket
                   className="action-btn btn-call" 
                   style={{ marginTop: '20px', padding: '0.8rem 2rem', width: '100%', borderRadius: '8px' }}
                 >
-                  CLAIM $1,000 FREE CHIPS
+                  CLAIM ₹1,000 FREE CHIPS
                 </button>
               )}
             </div>
@@ -126,7 +126,7 @@ const Account = ({ currentUser, setCurrentUser, handleLogout, handleJoin, socket
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ color: '#999', fontSize: '1.1rem' }}>Biggest Pot Won</span>
                   <span style={{ color: '#ffcc00', fontSize: '1.5rem', fontWeight: 'bold', textShadow: '0px 0px 8px rgba(255, 204, 0, 0.3)' }}>
-                    ${currentUser.stats?.biggestPotWon || 0}
+                    ₹{currentUser.stats?.biggestPotWon || 0}
                   </span>
                 </div>
               </div>

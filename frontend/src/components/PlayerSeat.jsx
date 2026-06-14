@@ -41,7 +41,7 @@ const PlayerSeat = ({ player, index, uiIndex, totalPlayers, isTheirTurn, isDeale
           {player.username}
         </div>
         <div style={{ color: '#4caf50', fontWeight: 'bold', fontSize: '1.2rem' }}>
-          ${player.chips}
+          ₹{player.chips}
         </div>
         <div style={{ fontSize: '0.8rem', color: '#aaa', marginTop: '4px', textTransform: 'uppercase' }}>
           {player.status}
@@ -49,7 +49,7 @@ const PlayerSeat = ({ player, index, uiIndex, totalPlayers, isTheirTurn, isDeale
         
         {player.roundBet > 0 && (
           <div style={{ background: 'rgba(255, 255, 255, 0.1)', borderRadius: '4px', padding: '2px 0', marginTop: '6px', fontSize: '0.9rem' }}>
-            Bet: ${player.roundBet}
+            Bet: ₹{player.roundBet}
           </div>
         )}
       </div>

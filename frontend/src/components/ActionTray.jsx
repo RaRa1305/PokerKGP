@@ -23,7 +23,7 @@ const ActionTray = ({ myCards, isMyTurn, currentBet, betAmount, setBetAmount, am
         <div className="action-controls">
           <div style={{ marginBottom: '15px', color: 'white', fontWeight: 'bold' }}>
             <label style={{ fontSize: '1.2rem', marginRight: '10px', color: '#ffcc00' }}>
-              {currentBet === 0 ? 'Bet Amount: $' : 'Raise To: $'}
+              {currentBet === 0 ? 'Bet Amount: ₹' : 'Raise To: ₹'}
             </label>
             <input 
               type="number" 
@@ -40,14 +40,14 @@ const ActionTray = ({ myCards, isMyTurn, currentBet, betAmount, setBetAmount, am
               FOLD
             </button>
             <button onClick={() => sendAction('call', 0)} className={`action-btn ${amountToCall >= myChips ? 'btn-allin' : 'btn-call'}`}>
-              {amountToCall >= myChips ? `ALL IN ($${myChips})` : (amountToCall > 0 ? `CALL $${amountToCall}` : 'CHECK')}
+              {amountToCall >= myChips ? `ALL IN (₹${myChips})` : (amountToCall > 0 ? `CALL ₹${amountToCall}` : 'CHECK')}
             </button>
             <button 
               disabled={currentBet > 0 && betAmount <= currentBet} 
               onClick={() => sendAction('raise', betAmount)} 
               className={`action-btn ${betAmount >= myChips ? 'btn-allin' : ((currentBet > 0 && betAmount <= currentBet) ? 'btn-disabled' : 'btn-raise')}`}
             >
-              {betAmount >= myChips ? 'SHOVE ALL IN' : (currentBet === 0 ? `BET $${betAmount}` : `RAISE TO $${betAmount}`)}
+              {betAmount >= myChips ? 'SHOVE ALL IN' : (currentBet === 0 ? `BET ₹${betAmount}` : `RAISE TO ₹${betAmount}`)}
             </button>
           </div>
         </div>

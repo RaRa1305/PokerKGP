@@ -183,7 +183,7 @@ function App() {
       </div>
 
       <div className="poker-table">
-        <div className="main-pot">Main Pot: ${tableData?.pot || 0}</div>
+        <div className="main-pot">Main Pot: ₹{tableData?.pot || 0}</div>
 
         <div className="community-cards">
           {[0, 1, 2, 3, 4].map(index => (
