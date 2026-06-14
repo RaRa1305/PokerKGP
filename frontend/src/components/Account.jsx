@@ -27,22 +27,25 @@ const Account = ({ currentUser, setCurrentUser, handleLogout, handleJoin, socket
   };
 
   return (
-    <div className="app-container lobby-wrapper">
-      {/* Top Right Logout Button */}
-      <div style={{ position: 'absolute', top: 20, right: 20, display: 'flex', gap: '15px' }}>
-        <button onClick={handleLogout} className="action-btn btn-fold" style={{ padding: '0.5rem 1rem' }}>
-          LOGOUT
-        </button>
-      </div>
-
-    {/* Centered Main Container */}
-      <div style={{ maxWidth: '900px', width: '100%', margin: '80px auto 0 auto' }}> 
+    <div 
+      className="app-container lobby-wrapper" 
+      style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh',
+        padding: '20px' // Adds a little breathing room on smaller screens
+      }}
+    >
+      {/* Centered Main Container */}
+      <div style={{ maxWidth: '900px', width: '100%' }}> 
         <h2 style={{ color: '#ffcc00', marginBottom: '30px', textAlign: 'center', fontSize: '2.5rem', textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
           Welcome, {currentUser.username}
         </h2>
         
-{/* TWO-COLUMN LAYOUT CONTAINER */}
-<div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap', justifyContent: 'center' }}>
+        {/* TWO-COLUMN LAYOUT CONTAINER */}
+        <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap', justifyContent: 'center' }}>
           
           {/* LEFT COLUMN: Bankroll & Room Joiner */}
           <div style={{ flex: '1 1 350px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -129,8 +132,19 @@ const Account = ({ currentUser, setCurrentUser, handleLogout, handleJoin, socket
               </div>
             </div>
           </div>
-
         </div>
+
+        {/* LOGOUT BUTTON - Centered at the bottom */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px' }}>
+          <button 
+            onClick={handleLogout} 
+            className="action-btn btn-fold" 
+            style={{ padding: '0.8rem 3rem', fontSize: '1.1rem', borderRadius: '8px', letterSpacing: '1px' }}
+          >
+            LOGOUT
+          </button>
+        </div>
+
       </div>
     </div>
   );
