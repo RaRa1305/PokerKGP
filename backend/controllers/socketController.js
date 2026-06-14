@@ -48,6 +48,15 @@ module.exports = (io) => {
                 gameState.players[winnerId].chips += pot.amount;
                 payoutMessages.push(`${gameState.players[winnerId].username} wins $${pot.amount} from ${potName} (Uncontested)`);
                 await syncChips(winnerId);
+                let dbUserId = gameState.players[winnerId].dbUserId;
+                if (dbUserId) {
+                    try {
+                        await User.findByIdAndUpdate(dbUserId, {
+                            $inc: { "stats.potsWon": 1 },
+                            $max: { "stats.biggestPotWon": pot.amount }
+                        });
+                    } catch (err) { console.error(err); }
+                }
                 continue;
             }
 
@@ -63,6 +72,15 @@ module.exports = (io) => {
             for (let w of winners) {
                 gameState.players[w.playerId].chips += splitPot;
                 await syncChips(w.playerId); 
+                let dbUserId = gameState.players[w.playerId].dbUserId;
+                if (dbUserId) {
+                    try {
+                        await User.findByIdAndUpdate(dbUserId, {
+                            $inc: { "stats.potsWon": 1 },
+                            $max: { "stats.biggestPotWon": splitPot }
+                        });
+                    } catch (err) { console.error(err); }
+                }
             }
 
             let winnerNames = winners.map(w => gameState.players[w.playerId].username).join(' & ');
@@ -243,11 +261,19 @@ module.exports = (io) => {
 
             const allCardsMap = {};
 
-            table.players.forEach(pId => {
+            table.players.forEach(async pId => { 
                 let p = gameState.players[pId];
                 p.status = 'Waiting'; p.roundBet = 0; p.totalInvested = 0; p.holeCards = [table.deck.pop(), table.deck.pop()];
                 io.to(pId).emit('HOLE_CARDS', { cards: p.holeCards });
                 allCardsMap[pId] = p.holeCards;
+
+                if (p.dbUserId) {
+                    try {
+                        await User.findByIdAndUpdate(p.dbUserId, { $inc: { "stats.handsPlayed": 1 } });
+                    } catch (err) {
+                        console.error("Hands played track error:", err);
+                    }
+                }
             });
 
             io.to(`${tableId}_SPECTATORS`).emit('SPECTATOR_CARDS', allCardsMap);
@@ -306,6 +332,17 @@ module.exports = (io) => {
                 winner.chips += table.pot;
                 io.to(tableId).emit('GAME_MESSAGE', { message: `${winner.username} wins $${table.pot} (Everyone folded)` });
                 await syncChips(playersInHand[0]); 
+
+                let dbUserId = winner.dbUserId;
+                if (dbUserId && table.pot > 0) {
+                    try {
+                        await User.findByIdAndUpdate(dbUserId, {
+                            $inc: { "stats.potsWon": 1 },
+                            $max: { "stats.biggestPotWon": table.pot }
+                        });
+                    } catch (err) { console.error(err); }
+                }
+
                 table.pot = 0; table.phase = 'waiting'; table.currentBet = 0; table.currentTurn = null;
                 table.dealerIndex = (table.players.indexOf(table.dealerId) + 1) % table.players.length; table.dealerId = table.players[table.dealerIndex];
                 return syncTable(tableId);
@@ -341,7 +378,18 @@ module.exports = (io) => {
                     if (playersInHand.length === 1) {
                         gameState.players[playersInHand[0]].chips += table.pot;
                         io.to(tableId).emit('GAME_MESSAGE', { message: `${gameState.players[playersInHand[0]].username} wins $${table.pot} (Opponent left)` });
-                        await syncChips(playersInHand[0]); 
+                        await syncChips(playersInHand[0]);
+                        
+                        let dbUserId = gameState.players[playersInHand[0]].dbUserId;
+                        if (dbUserId && table.pot > 0) {
+                            try {
+                                await User.findByIdAndUpdate(dbUserId, {
+                                    $inc: { "stats.potsWon": 1 },
+                                    $max: { "stats.biggestPotWon": table.pot }
+                                });
+                            } catch (err) { console.error(err); }
+                        }
+
                         table.pot = 0; table.phase = 'waiting'; table.currentBet = 0; table.currentTurn = null;
                     } else {
                         advancePhase(tableId); 
@@ -376,6 +424,17 @@ module.exports = (io) => {
                             gameState.players[playersInHand[0]].chips += table.pot;
                             io.to(p.tableId).emit('GAME_MESSAGE', { message: `${gameState.players[playersInHand[0]].username} wins $${table.pot} (Opponent disconnected)` });
                             await syncChips(playersInHand[0]); 
+
+                            let dbUserId = gameState.players[playersInHand[0]].dbUserId;
+                            if (dbUserId && table.pot > 0) {
+                                try {
+                                    await User.findByIdAndUpdate(dbUserId, {
+                                        $inc: { "stats.potsWon": 1 },
+                                        $max: { "stats.biggestPotWon": table.pot }
+                                    });
+                                } catch (err) { console.error(err); }
+                            }
+                            
                             table.pot = 0; table.phase = 'waiting'; table.currentBet = 0; table.currentTurn = null;
                         } else {
                             let nextIndex = table.turnIndex;

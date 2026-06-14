@@ -12,7 +12,21 @@ const userSchema = mongoose.Schema({
     },
     chips: {
         type: Number,
-        default: 5000, // Everyone starts with a ₹5000.
+        default: 5000, // Everyone starts with ₹5000.
+    },
+    stats: {
+        handsPlayed: { 
+            type: Number, 
+            default: 0 
+        },
+        potsWon: { 
+            type: Number, 
+            default: 0 
+        },
+        biggestPotWon: { 
+            type: Number, 
+            default: 0 
+        }
     }
 }, {
     timestamps: true
