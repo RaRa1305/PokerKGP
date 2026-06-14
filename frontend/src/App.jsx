@@ -44,6 +44,11 @@ function App() {
     if (!currentUser) return;
     socket.connect();
 
+    socket.on('JOIN_ERROR', ({ message }) => {
+      alert(message);
+      setCurrentView('account');
+      setTableData(null);
+    });
     socket.on('SPECTATOR_CARDS', (cardMap) => setSpectatorCards(cardMap));
     socket.on('TABLE_SYNC', (data) => {
       setTableData(data);

@@ -138,29 +138,58 @@ module.exports = (io) => {
 
     io.on('connection', (socket) => {
         socket.on('JOIN_TABLE', async ({ username, tableId, userId }) => {
+            if (!gameState.tables[tableId]) {
+                gameState.tables[tableId] = { players: [], board: [], phase: 'waiting', deck: [], pot: 0, currentBet: 0 };
+            }
+
+            const table = gameState.tables[tableId];
+            const isPlayingAnywhere = Object.values(gameState.players).some(p => 
+                p && (p.dbUserId === userId || p.username === username)
+            );
+
+            if (isPlayingAnywhere) {
+                socket.emit('JOIN_ERROR', { message: "You are already playing at a table! Please leave it before joining." });
+                return; // Abort everything right here
+            }
+
             let initialChips = 1000;
             if (userId) {
                 try {
                     const dbUser = await User.findById(userId);
                     if (dbUser) initialChips = dbUser.chips; 
-                } catch (err) {}
+                } catch (err) {
+                    console.error("DB Error fetching chips:", err);
+                }
             }
 
             gameState.players[socket.id] = { username, chips: initialChips, tableId, dbUserId: userId };
-            if (!gameState.tables[tableId]) gameState.tables[tableId] = { players: [], board: [], phase: 'waiting', deck: [], pot: 0, currentBet: 0 };
-            if (!gameState.tables[tableId].players.includes(socket.id)) gameState.tables[tableId].players.push(socket.id);
+            
+            if (!gameState.tables[tableId].players.includes(socket.id)) {
+                gameState.tables[tableId].players.push(socket.id);
+            }
             
             socket.join(tableId);
             syncTable(tableId);
         });
 
-        socket.on('SPECTATE_TABLE', ({ username, tableId }) => {
-            socket.join(`${tableId}_SPECTATORS`); 
-            socket.join(tableId); 
+        socket.on('SPECTATE_TABLE', ({ username, tableId,userId }) => {
 
             const table = gameState.tables[tableId]; 
             
             if (table) {
+                const isAlreadyPlaying = table.players.some(pId => 
+                    gameState.players[pId] && 
+                    (gameState.players[pId].userId === userId || gameState.players[pId].username === username)
+                );
+
+                if (isAlreadyPlaying) {
+                    socket.emit('JOIN_ERROR', { message: "You cannot spectate a table you are already playing at." });
+                    return; // Abort the spectate request completely
+                }
+
+                socket.join(`${tableId}_SPECTATORS`); 
+                socket.join(tableId); 
+
                 socket.emit('TABLE_SYNC', {
                     tableId, board: table.board, phase: table.phase, pot: table.pot || 0,
                     dealerId: table.dealerId, currentTurn: table.currentTurn, currentBet: table.currentBet || 0,
